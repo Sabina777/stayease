@@ -6,17 +6,11 @@ const { ApolloServer } = require('apollo-server-express');
 const db = require('./models'); // Sequelize models/index.js
 const { gql } = require('apollo-server-express');
 
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
+const typeDefs = require('./schema'); // GraphQL schema
+const resolvers = require('./resolvers'); // GraphQL resolvers
 
-const resolvers = {
-  Query: {
-    hello: () => 'Hello from StayEase backend!',
-  },
-};
+module.exports = resolvers;
+
 async function startServer() {
   const app = express();
 
@@ -24,6 +18,8 @@ async function startServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+      context: () => ({ db }), 
+
   });
   await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
